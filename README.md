@@ -19,9 +19,9 @@ Use this loop to implement defined features/stories in isolation.
 ```
 
 ### 3. Review & Feedback Loop
-Use this loop to quality-gate changes, review PRs, and automatically fix issues.
+Use this loop to quality-gate changes, review PRs, automatically fix issues, and safely merge.
 ```
-[Fresh Window on main] ──> /review <PR> ──> [Clear Context / Fresh Window] ──> /fix-review <Review File>
+[Fresh Window on main] ──> /review <PR> ──> [Clear Context] ──> /fix-review <Review File> ──> [Clear Context] ──> /merge-pr <PR>
 ```
 
 ---
@@ -90,3 +90,10 @@ Use this loop to quality-gate changes, review PRs, and automatically fix issues.
 * **Arguments**: `<path/to/review.md | PR number> [--all]`
 * **Context Style**: 🧼 **Fresh Context** (run in a clean agent session to focus entirely on fixing).
 * **Possible Scenarios**: After a review report signals `NEEDS WORK` and you want to auto-remediate the feedback.
+
+### 11. `merge-pr`
+* **What it does**: Runs integration safety checks, maps downstream file dependencies, audits API breaking changes and database migration safety, presents a risk evaluation report, merges the PR, cleans up local/remote branch states, and transitions the associated Jira ticket to Done.
+* **Arguments**: `<pr-number>`
+* **Context Style**: 🧼 **Fresh Context** (run in a clean session before merging to avoid context pollution).
+* **Possible Scenarios**: When you are satisfied with a PR's status, review fixes have passed, and you want to safely squash-merge and clean up branches.
+
