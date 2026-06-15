@@ -1,7 +1,7 @@
 ---
 name: review
 description: Code review - reviews PRs, files, folders, or any code scope
-argument-hint: <pr-number|file|folder|scope> [--gate=high|medium|critical]
+argument-hint: <pr-number|file|folder|scope> [--gate=high|medium|critical] [--plan=path] [--report=path]
 ---
 
 # Code Review
@@ -13,16 +13,17 @@ argument-hint: <pr-number|file|folder|scope> [--gate=high|medium|critical]
 Perform a thorough code review:
 1. **Understand** what you're reviewing and its purpose
 2. **Check** the code against project patterns
-3. **Run** validation (type-check, lint, tests)
-4. **Identify** issues by severity
-5. **Gate** — determine if the PR passes the severity threshold
-6. **Report** findings with branch metadata so `/fix-review` can consume the output
+3. **Verify Compliance** — compare the implemented changes against the intended plan and implementation report (if available) to ensure intent is met and deviations are justified
+4. **Run** validation (type-check, lint, tests)
+5. **Identify** issues by severity
+6. **Gate** — determine if the PR passes the severity threshold
+7. **Report** findings with branch metadata so `/fix-review` can consume the output
 
 **Golden Rule**: Be constructive and actionable. Every issue should have a clear recommendation.
 
 ---
 
-## Phase 1: DETERMINE SCOPE
+## Phase 1: DETERMINE SCOPE & ARTIFACTS
 
 ### Parse Input
 
@@ -41,6 +42,8 @@ Perform a thorough code review:
 | `--gate=critical` | — | Only block on Critical issues |
 | `--gate=high` | ✅ default | Block on Critical + High issues |
 | `--gate=medium` | — | Block on Critical + High + Medium issues |
+| `--plan=<path>` | (auto-detect) | Compare against a specific implementation plan |
+| `--report=<path>` | (auto-detect) | Compare against a specific implementation report |
 
 ### Get Review Target
 
@@ -79,9 +82,17 @@ Record:
 - **Base Branch**: what it's merging into (usually `main`)
 - **PR Number**: if applicable
 
+### Resolve Plan and Report Artifacts
+
+If `--plan` or `--report` are not explicitly specified:
+1. Identify the feature name from the branch name (e.g. `feature/add-auth` ➔ `add-auth`) or the PR title.
+2. Search `.agents/plans/` and `.agents/plans/completed/` for `{feature-name}.plan.md`.
+3. Search `.agents/reports/` for `{feature-name}-report.md`.
+4. If found, load both files to read the intent and outcomes.
+
 ---
 
-## Phase 2: CONTEXT
+## Phase 2: CONTEXT & INTENT MATCHING
 
 ### Read Project Rules
 
@@ -93,6 +104,20 @@ Record:
 - For files: Understand the file's purpose in the codebase
 - For changes: What was modified and why?
 
+### Parse Plan and Report (Intent Verification)
+
+If plan or report files are available:
+1. **Extract Plan Scope**:
+   - What were the **Acceptance Criteria**?
+   - What files were designated to be **CREATED** or **UPDATED**?
+   - What tests were planned?
+2. **Extract Report Outcomes**:
+   - What deviations did the implementation report record?
+3. **Compare Diff to Plan**:
+   - Did the implementation create/update files that were *not* in the plan? Are these changes justified?
+   - Were any files/tasks in the plan omitted?
+   - Does the test coverage in the diff align with the planned test specifications?
+
 ---
 
 ## Phase 3: REVIEW
@@ -103,6 +128,7 @@ For each file in scope, check:
 
 | Category | Check |
 |----------|-------|
+| **Compliance & Intent** | Does the code align with the plan design? Are all Acceptance Criteria satisfied? If deviations occurred, are they documented and correct? |
 | **Correctness** | Does the code work as intended? |
 | **Type Safety** | Are types explicit, no implicit `any`? |
 | **Patterns** | Does it follow existing codebase patterns? |
