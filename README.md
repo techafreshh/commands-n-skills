@@ -97,3 +97,13 @@ Use this loop to quality-gate changes, review PRs, automatically fix issues, and
 * **Context Style**: 🧼 **Fresh Context** (run in a clean session before merging to avoid context pollution).
 * **Possible Scenarios**: When you are satisfied with a PR's status, review fixes have passed, and you want to safely squash-merge and clean up branches.
 
+
+### 12. `excalidraw-diagram`
+* **What it does**: Generates `.excalidraw` diagrams that argue visually (not just label boxes) for workflows, architectures, and protocols — maps each concept to a matching visual pattern (fan-out, convergence, timeline, cycle), includes evidence artifacts (real code snippets, data formats, API names), renders the result to PNG headlessly, and runs a render-view-fix loop until the layout is clean. Light and dark modes are supported via `references/color-palette.md` / `color-palette-dark.md`.
+* **Arguments**: `<concept|workflow|architecture to diagram>` (usually discussed in session first).
+* **Context Style**: 🧠 **Primed Context** (run after discussing the system you want visualized so the diagram reflects the real design, not generic boxes).
+* **Possible Scenarios**: 
+  * Visualizing a system architecture for a README or docs.
+  * Explaining a protocol or pipeline (e.g., TLS handshake, event loop, RAG) as a teaching diagram.
+  * Before/after or side-by-side visuals for a design decision.
+* **Setup**: One-time `npm i -g agent-browser && agent-browser install` (headless Chromium via CDP). The render script is stdlib-only Python — no pip/uv packages.
